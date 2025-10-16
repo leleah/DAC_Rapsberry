@@ -12,8 +12,8 @@
 #define PI 3.14159
 int main()
 {
-int fd;
-int value,angle;
+int16_t fd,value;
+double v_d,angle;
 fd=open(I2C_BUS,O_RDWR);
         if(fd<0)
         {
@@ -28,20 +28,28 @@ fd=open(I2C_BUS,O_RDWR);
         }
 
 printf("Connected to mcp4725 (0x%02X)\r\n",MCP4725_ADDR);
-
-int N=1000;
-for(int k=0; k<N-1; k++)
+while(1)
 {
-    angle=2*M_PI*k/N;
-    value=(sin(angle)+1.0)/2.0*4095;
+    int N=1000;
+for(int k=0; k<N; k++)
+{
+    angle=2*PI*k/N;
+    value = (int)round((sin(angle)+1.0)/2*4095);
+    if(value<0) value =0;
+    if(value > 4095) value = 4095;
+
     uint8_t ob = (value>>4)&0xFF;
     uint8_t sb = (value&0x0F)<<4;
     uint8_t buff[2] = { ob, sb };
-    write(fd,buff,2);
-    usleep(100);
-    if(k==N)
+    if(k==0 || k==N/4 || k==N/2 || k==3*N/4 || k==N-1)
     {
-        k=0;
+        printf("%d - value\r\n ",value);
     }
+
+    write(fd,buff,2);
+    usleep(500);
+
 }
+}
+
 }

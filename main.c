@@ -40,13 +40,13 @@ for(int k=0; k<N; k++)
 
     uint8_t ob = (value>>4)&0xFF;
     uint8_t sb = (value&0x0F)<<4;
-    uint8_t buff[2] = { ob, sb };
+    uint8_t buff[3] = { 0x00, ob, sb };
     if(k==0 || k==N/4 || k==N/2 || k==3*N/4 || k==N-1)
     {
         printf("%d - value\r\n ",value);
     }
 
-    write(fd,buff,2);
+    write(fd,buff,3);
     usleep(500);
 
 }

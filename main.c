@@ -14,6 +14,7 @@ int main()
 {
 int16_t fd,value;
 double v_d,angle;
+
 fd=open(I2C_BUS,O_RDWR);
         if(fd<0)
         {
@@ -32,22 +33,27 @@ while(1)
 {
     int N=1000;
 for(int k=0; k<N; k++)
-{
+{   double arr[k],arr2[k],arr3[k];
     angle=2*PI*k/N;
     value = (int)round((sin(angle)+1.0)/2*4095);
     if(value<0) value =0;
     if(value > 4095) value = 4095;
-
-    uint8_t ob = (value>>4)&0xFF;
-    uint8_t sb = (value&0x0F)<<4;
-    uint8_t buff[3] = { 0x00, ob, sb };
+    arr[k]=value;
+    uint8_t ob = (value>>8)&0x0F;
+    uint8_t sb = value&0xFF;
+    arr2[k] = ob;
+    arr3[k] = sb;
+    uint8_t buff[3] = { ob, sb };
     if(k==0 || k==N/4 || k==N/2 || k==3*N/4 || k==N-1)
     {
         printf("%d - value\r\n ",value);
     }
-
-    write(fd,buff,3);
-    usleep(500);
+    usleep(100);
+    if(write(fd,buff,3)<3)
+    {
+        perror("write");
+    }
+    usleep(1000);
 
 }
 }
